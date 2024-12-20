@@ -60,7 +60,9 @@ document.addEventListener("DOMContentLoaded", () => {
             { str: "/Local/", ans: "WMS（ウェブマネージメントシステム）" },
 
             // CMSKIT
+            { str: "WCVTEXT", ans: "CMSKIT" },
             { str: "背景色－黒", ans: "CMSKIT" },
+            { str: "/_assets/css/", ans: "CMSKIT" },
             { str: 'href="css/', ans: "CMSKIT（違うかもしれません）" },
 
             // PowerCMS
