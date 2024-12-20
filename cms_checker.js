@@ -59,11 +59,15 @@ document.addEventListener("DOMContentLoaded", () => {
             // WMS（ウェブマネージメントシステム）
             { str: '/Local/', ans: 'WMS（ウェブマネージメントシステム）' },
 
+            // WebコアCMS(WebコアEnterprise)
+            { str: 'src="/core/', ans: 'WebコアCMS(WebコアEnterprise)' },
+            { str: '/shared_new/shared/', ans: 'WebコアCMS(WebコアEnterprise)' },
+
             // CMSKIT
             { str: 'WCVTEXT', ans: 'CMSKIT' },
             { str: '背景色－黒', ans: 'CMSKIT' },
             { str: '/_assets/css/', ans: 'CMSKIT' },
-            { str: 'href="css/', ans: 'CMSKIT（違うかもしれません）' },
+            // { str: 'href="css/', ans: 'CMSKIT（違うかもしれません）' },
 
             // PowerCMS
             { str: '/common/img/', ans: 'PowerCMS（違うかもしれません）' },
@@ -83,16 +87,10 @@ document.addEventListener("DOMContentLoaded", () => {
             // MovableType
             { str: '/mt-', ans: 'MovableType' },
 
-            // WebコアCMS(WebコアEnterprise)
-            { str: 'src="/core/', ans: 'WebコアCMS(WebコアEnterprise)' },
-            { str: '/shared_new/shared/', ans: 'WebコアCMS(WebコアEnterprise)' },
-            { str: '/shared_new/shared/', ans: 'WebコアCMS(WebコアEnterprise)' },
-
             // WillCommunity
             // WEB-NA
             // assetnow
             // WebRelease
-
             { str: '検索条件', ans: '回答' },
           ];
 
