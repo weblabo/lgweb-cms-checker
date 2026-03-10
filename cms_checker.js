@@ -30,9 +30,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         const columns = parseCSVRow(row);
 
-        if (columns.length >= 9) {
-          let urlStr = columns[4].replace(/^"/, "").replace(/"$/, "");
-          let dateStr = columns[8].replace(/^"/, "").replace(/"$/, "");
+        if (columns.length >= 2) {
+          let urlStr = columns[1].replace(/^"/, "").replace(/"$/, "");
+          let dateStr = columns[2].replace(/^"/, "").replace(/"$/, "");
 
           try {
             if (!urlStr.startsWith("http")) urlStr = "http://" + urlStr;
