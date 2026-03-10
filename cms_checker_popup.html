@@ -1,40 +1,69 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>自治体公式サイト CMS Checker</title>
+    <script src="./cms_checker.js"></script>
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>自治体公式サイト CMS Checker</title>
-  <script src="./cms_checker.js"></script>
+    <style>
+      :where(:root) {
+        line-break: strict;
+        word-break: normal;
+        overflow-wrap: anywhere;
+        text-spacing-trim: trim-start;
+        text-autospace: normal;
+        scrollbar-gutter: stable;
+      }
 
-  <style>
-    body {
-      width: 480px;
-      margin: 0;
-      padding: 16px;
-      background-color: #F0FAFE;
-    }
-    h2 {
-      margin: 0 0 12px;;
-      font-size: 1.4rem;
-    }
-    input {
-      width: 400px;
-    }
-    hr {
-      margin: 1rem 0;
-    }
-  </style>
-</head>
+      :where(
+        pre,
+        time,
+        input:not([type="button" i], [type="submit" i], [type="reset" i]),
+        textarea,
+        [contenteditable]
+      ) {
+        text-autospace: no-autospace;
+      }
 
-<body>
-  <div class="container">
-    <h2>自治体公式サイト CMS Checker</h2>
-    <label for="url">URL:</label>
-    <input type="text" id="url" readonly>
-  </div>
-  <hr />
-  <div id="result"></div>
-</body>
+      :where(h1, h2, h3, h4, h5, h6) {
+        text-wrap: pretty;
+      }
 
+      body {
+        width: 480px;
+        margin: 0;
+        padding: 16px;
+        line-height: 1.6;
+        background-color: #f0fafe;
+        font-family:
+          "Helvetica Neue", "Arial", "Hiragino Kaku Gothic ProN",
+          "Hiragino Sans", "BIZ UDPGothic", "Noto Sans JP", sans-serif;
+      }
+
+      h2 {
+        margin: 0 0 12px;
+        font-size: 1.2rem;
+      }
+
+      input {
+        width: 400px;
+      }
+
+      hr {
+        margin: 1rem 0;
+      }
+
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <h2>自治体サイト CMS Checker</h2>
+      <label for="url">URL:</label>
+      <input type="text" id="url" readonly />
+    </div>
+    <hr />
+    <div id="result"></div>
+  </body>
 </html>
