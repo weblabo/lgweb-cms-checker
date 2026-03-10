@@ -28,11 +28,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       rows.forEach((row) => {
         if (!row.trim()) return; // 空行をスキップ
 
-        // 新しいパース関数を使って列を正確に分割
         const columns = parseCSVRow(row);
 
         if (columns.length >= 9) {
-          // 5列目(インデックス4)と9列目(インデックス8)を取得し、引用符を除去
           let urlStr = columns[4].replace(/^"/, "").replace(/"$/, "");
           let dateStr = columns[8].replace(/^"/, "").replace(/"$/, "");
 
@@ -52,14 +50,20 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
+  // Load CSV data first
   const renewalData = await getRenewalData();
 
+  // Get the current tab
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
     const currentTab = tabs[0];
-    const currentUrl = new URL(currentTab.url);
-    const currentDomain = currentUrl.hostname;
+    if (!currentTab) return;
 
-    document.getElementById("url").value = currentTab.url;
+    let currentDomain = "";
+    if (currentTab.url) {
+      const currentUrl = new URL(currentTab.url);
+      currentDomain = currentUrl.hostname;
+      document.getElementById("url").value = currentTab.url;
+    }
 
     chrome.scripting.executeScript(
       {
@@ -67,192 +71,81 @@ document.addEventListener("DOMContentLoaded", async () => {
         func: () => {
           const html = document.documentElement.outerHTML;
           const stringsToCheck = [
-            // SmartCMS
-            { str: "smart-lgov", ans: "SmartCMS" },
-
-            // NetCrew
-            { str: 'src="/ssi/', ans: "NetCrew" },
-
-            // CMS-8341
-            { str: 'src="/shared/', ans: "CMS-8341" },
-
-            // TsuNaGo
-            { str: "/_template_/", ans: "TsuNaGo" },
-
-            // CMSKIT
-            { str: "WCVTEXT", ans: "CMSKIT" },
-            { str: "背景色－黒", ans: "CMSKIT" },
-            { str: "/_assets/css/", ans: "CMSKIT" },
-            // { str: 'href="css/', ans: 'CMSKIT（違うかもしれません）' },
-
-            // 4Uweb/CMS
-            { str: "scs_jyogai_start", ans: "4Uweb/CMS" },
-            { str: 'class="jsmessage"', ans: "4Uweb/CMS" },
-
-            // SHIRASAGI
-            { str: "SS.config", ans: "SHIRASAGI" },
-
-            // Joruri CMS 2020 Release5以上
-            { str: "/_common/assets/", ans: "Joruri CMS 2020 Release5以上" },
-
-            // Joruri CMS 2020 Release4以下
-            { str: "/_common/packs/", ans: "Joruri CMS 2020 Release4以下" },
-
-            // Joruri CMS ver.3
-            { str: "/_layouts/00000406/", ans: "Joruri CMS ver.3以下" },
-            { str: "/_common/themes/", ans: "Joruri CMS ver.3以下" },
-
-            // Joruri or ZOMEKI
-            { str: "/_themes/", ans: "Joruri or ZOMEKI" },
-
-            // UD Face
-            { str: "▼▼フリーHTML▼▼", ans: "UD Face" },
-            { str: "0-0-0-0-0-0.html", ans: "UD Face" },
-
-            // WIKIPLUS(infiniCloud株式会社)
-            { str: 'href="wikiplus/', ans: "WIKIPLUS(infiniCloud株式会社)" },
-            { str: 'src="wikiplus/', ans: "WIKIPLUS(infiniCloud株式会社)" },
-
-            // WordPress
-            { str: "/wp-content/", ans: "WordPress" },
-            { str: "/wp-includes/", ans: "WordPress" },
-            { str: "/wp-admin/", ans: "WordPress" },
-            { str: "/wp/", ans: "WordPress" },
-
-            // i-CityPortal
-            { str: "/www/assets/", ans: "i-CityPortal" },
-            { str: 'href="/www/index.html', ans: "i-CityPortal" },
-            { str: 'href="/www/contents/', ans: "i-CityPortal" },
-
-            // i-SITE PORTAL
-            { str: "/css/Browser_C/", ans: "i-SITE PORTAL" },
-
-            // WebコアCMS(WebコアEnterprise) or Drupal
-            { str: 'src="/core/', ans: "WebコアCMS（WebコアEnterprise）" },
-            {
-              str: "/shared_new/shared/",
-              ans: "WebコアCMS（WebコアEnterprise）",
-            },
-            { str: 'src="/materials/', ans: "WebコアCMS（WebコアEnterprise）" },
-
-            // MovableType
-            { str: "/mt-", ans: "MovableType" },
-            { str: "form.movabletype.net", ans: "MovableType" },
-            // { str: '/_Incapsula_Resource', ans: 'MovableType' },
-
-            // WMS（ウェブマネージメントシステム）
-            { str: "/Local/", ans: "WMS（ウェブマネージメントシステム）" },
-
-            // ALAYA
-            { str: "/content/000", ans: "ALAYA" },
-            { str: "/common/000", ans: "ALAYA" },
-
-            // 優CMS
-            { str: "skin/common/", ans: "優CMS" },
-
-            // e-CLEAR
-            { str: "/share/style/", ans: "e-CLEAR" },
-
-            // BayBerry
-            { str: "/file/css/", ans: "BayBerry" },
-
-            // Drupal
-            {
-              str: 'content="Drupal',
-              ans: "Drupal（下層ページを見るとWordPressの場合があります）",
-            },
-
-            // Web CMS
-            { str: 'src="https://img.japandx.co.jp/', ans: "Web CMS" },
-
-            { str: "/rss/RssFeed.jsp", ans: "株式会社アイアムの独自CMS" },
-            { str: "/detail.jsp?id=", ans: "株式会社アイアムの独自CMS" },
-
-            { str: "/user/common/", ans: "JSM（ジャプロサイトメーカー）" },
-            {
-              str: "/user/gyosei/common",
-              ans: "JSM（ジャプロサイトメーカー）",
-            },
-
-            // Concrete CMS
-            { str: 'src="/themes/', ans: "Concrete CMS" },
-
-            // 不明パターン
-            { str: "/?category=", ans: "不明CMS1" },
-
-            { str: "kanaboweb", ans: "不明CMS2" },
-
-            { str: "/hotnews/category/", ans: "不明CMS3" },
-
-            { str: "/page000", ans: "不明CMS4" },
-            { str: "/files/100", ans: "不明CMS4" },
-
-            { str: "/index.cfm/", ans: "不明CMS5" },
-
-            { str: 'href="/theme/', ans: "不明CMS8" },
-
-            { str: 'src="/assets/js/bundle.js', ans: "不明CMS10" },
-
-            { str: "/_nuxt/entry.", ans: "不明CMS11" },
-
-            { str: 'class="opening"', ans: "不明CMS14" },
-
-            { str: '/list00101.html"', ans: "不明CMS15" },
-
-            { str: "/banner_click.php?", ans: "不明CMS16" },
-
-            { str: "-img/", ans: "不明CMS17" },
-
-            { str: "/post_", ans: "不明CMS19" },
-
-            { str: "/detail.php?id=", ans: "不明CMS20" },
-
-            { str: "/index.php?id=", ans: "不明CMS21" },
-
-            { str: "/documents/m_cms/", ans: "不明CMS22" },
-
-            { str: "/dynamic/common/", ans: "不明CMS23" },
-
-            { str: "/life/list.php?", ans: "不明CMS24" },
-
-            {
-              str: "サイトの閲覧には問題ありませんが、より快適にご利用いただくためにJavascriptをONにすることをお勧めします。",
-              ans: "不明CMS25",
-            },
-
-            // PowerCMS
-            // { str: '/common/img/', ans: 'PowerCMS（違うかもしれません）' },
-            {
-              str: 'content="/assets/"',
-              ans: "PowerCMSかもしれません（PowerCMSを完全に見分ける方法は不明です）",
-            },
-            {
-              str: "/assets/front/",
-              ans: "PowerCMSかもしれません（PowerCMSを完全に見分ける方法は不明です）",
-            },
-            {
-              str: 'href="/assets/css/',
-              ans: "PowerCMSかもしれません（PowerCMSを完全に見分ける方法は不明です）",
-            },
-
-            // スマートシティプラットフォーム（都市OS)
-            {
-              str: "/_Incapsula_Resource",
-              ans: "スマートシティプラットフォーム（都市OS)（トップページの場合は違う場合があります）",
-            },
-
-            // WillCommunity
-            // WEB-NA
-            // assetnow
-            // WebRelease
-            // NetCommons
-            // SITE PUBLIS
-            { str: "検索条件をいれる", ans: "回答を表示" },
+            { reg: /smart-lgov/, ans: "SmartCMS" },
+            { reg: /src="\/ssi\//, ans: "NetCrew" },
+            { reg: /src="\/shared\//, ans: "CMS-8341" },
+            { reg: /\/_template_\//, ans: "TsuNaGo" },
+            { reg: /WCVTEXT/, ans: "CMSKIT" },
+            { reg: /背景色－黒/, ans: "CMSKIT" },
+            { reg: /\/_assets\/css\//, ans: "CMSKIT" },
+            { reg: /scs_jyogai_start/, ans: "4Uweb/CMS" },
+            { reg: /class="jsmessage"/, ans: "4Uweb/CMS" },
+            { reg: /SS\.config/, ans: "SHIRASAGI" },
+            { reg: /\/_common\/assets\//, ans: "Joruri CMS 2020 Release5以上" },
+            { reg: /\/_common\/packs\//, ans: "Joruri CMS 2020 Release4以下" },
+            { reg: /\/_layouts\/00000406\//, ans: "Joruri CMS ver.3以下" },
+            { reg: /\/_common\/themes\//, ans: "Joruri CMS ver.3以下" },
+            { reg: /\/_themes\//, ans: "Joruri or ZOMEKI" },
+            { reg: /▼▼フリーHTML▼▼/, ans: "UD Face" },
+            { reg: /0-0-0-0-0-0\.html/, ans: "UD Face" },
+            { reg: /href="wikiplus\//, ans: "WIKIPLUS(infiniCloud株式会社)" },
+            { reg: /src="wikiplus\//, ans: "WIKIPLUS(infiniCloud株式会社)" },
+            { reg: /\/wp-content\//, ans: "WordPress" },
+            { reg: /\/wp-includes\//, ans: "WordPress" },
+            { reg: /\/wp-admin\//, ans: "WordPress" },
+            { reg: /\/wp\//, ans: "WordPress" },
+            { reg: /\/www\/assets\//, ans: "i-CityPortal" },
+            { reg: /href="\/www\/index\.html/, ans: "i-CityPortal" },
+            { reg: /href="\/www\/contents\//, ans: "i-CityPortal" },
+            { reg: /\/css\/Browser_C\//, ans: "i-SITE PORTAL" },
+            { reg: /src="\/core\//, ans: "WebコアCMS（WebコアEnterprise）" },
+            { reg: /\/shared_new\/shared\//, ans: "WebコアCMS（WebコアEnterprise）" },
+            { reg: /src="\/materials\//, ans: "WebコアCMS（WebコアEnterprise）" },
+            { reg: /\/mt-/, ans: "MovableType" },
+            { reg: /form\.movabletype\.net/, ans: "MovableType" },
+            { reg: /\/Local\//, ans: "WMS（ウェブマネージメントシステム）" },
+            { reg: /\/content\/000/, ans: "ALAYA" },
+            { reg: /\/common\/000/, ans: "ALAYA" },
+            { reg: /skin\/common\//, ans: "優CMS" },
+            { reg: /\/share\/style\//, ans: "e-CLEAR" },
+            { reg: /\/file\/css\//, ans: "BayBerry" },
+            { reg: /content="Drupal/, ans: "Drupal（下層ページを見るとWordPressの場合があります）" },
+            { reg: /src="https:\/\/img\.japandx\.co\.jp\//, ans: "Web CMS" },
+            { reg: /\/rss\/RssFeed\.jsp/, ans: "株式会社アイアムの独自CMS" },
+            { reg: /\/detail\.jsp\?id=/, ans: "株式会社アイアムの独自CMS" },
+            { reg: /\/user\/common\//, ans: "JSM（ジャプロサイトメーカー）" },
+            { reg: /\/user\/gyosei\/common/, ans: "JSM（ジャプロサイトメーカー）" },
+            { reg: /src="\/themes\//, ans: "Concrete CMS" },
+            { reg: /\/\?category=/, ans: "不明CMS1" },
+            { reg: /kanaboweb/, ans: "不明CMS2" },
+            { reg: /\/hotnews\/category\//, ans: "不明CMS3" },
+            { reg: /\/page000/, ans: "不明CMS4" },
+            { reg: /\/files\/100/, ans: "不明CMS4" },
+            { reg: /\/index\.cfm\//, ans: "不明CMS5" },
+            { reg: /href="\/theme\//, ans: "不明CMS8" },
+            { reg: /src="\/assets\/js\/bundle\.js/, ans: "不明CMS10" },
+            { reg: /\/_nuxt\/entry\./, ans: "不明CMS11" },
+            { reg: /class="opening"/, ans: "不明CMS14" },
+            { reg: /\/list00101\.html"/, ans: "不明CMS15" },
+            { reg: /\/banner_click\.php\?/, ans: "不明CMS16" },
+            { reg: /-img\//, ans: "不明CMS17" },
+            { reg: /\/post_/, ans: "不明CMS19" },
+            { reg: /\/detail\.php\?id=/, ans: "不明CMS20" },
+            { reg: /\/index\.php\?id=/, ans: "不明CMS21" },
+            { reg: /\/documents\/m_cms\//, ans: "不明CMS22" },
+            { reg: /\/dynamic\/common\//, ans: "不明CMS23" },
+            { reg: /\/life\/list\.php\?/, ans: "不明CMS24" },
+            { reg: /JavascriptをONにすることをお勧めします。/, ans: "不明CMS25" },
+            { reg: /content="\/assets\/"/, ans: "PowerCMSかもしれません" },
+            { reg: /\/assets\/front\//, ans: "PowerCMSかもしれません" },
+            { reg: /href="\/assets\/css\//, ans: "PowerCMSかもしれません" },
+            { reg: /\/_Incapsula_Resource/, ans: "スマートシティプラットフォーム（都市OS)" },
+            { reg: /検索条件をいれる/, ans: "回答を表示" },
           ];
 
           let cmsName = "該当するCMSはありません";
           for (const item of stringsToCheck) {
-            if (html.includes(item.str)) {
+            if (item.reg.test(html)) {
               cmsName = item.ans;
               break;
             }
@@ -265,12 +158,11 @@ document.addEventListener("DOMContentLoaded", async () => {
         const resultText = injectionResults[0].result;
 
         const matchedDate = renewalData[currentDomain];
-        const dateDisplay =
-          matchedDate && matchedDate !== "" ? matchedDate : "不明";
+        const dateDisplay = (matchedDate && matchedDate !== "") ? matchedDate : "不明";
 
         document.getElementById("result").innerHTML =
           `CMS: ${resultText}<br><span>リニューアル日: ${dateDisplay}</span>`;
-      },
+      }
     );
   });
 });
