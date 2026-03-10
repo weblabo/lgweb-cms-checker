@@ -1,6 +1,64 @@
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
+  // 1. ダブルクォーテーション内のカンマを無視して正しく列を分割する関数
+  function parseCSVRow(str) {
+    let result = [];
+    let cur = "";
+    let inQuotes = false;
+    for (let i = 0; i < str.length; i++) {
+      if (str[i] === '"') {
+        inQuotes = !inQuotes;
+      } else if (str[i] === "," && !inQuotes) {
+        result.push(cur.trim());
+        cur = "";
+      } else {
+        cur += str[i];
+      }
+    }
+    result.push(cur.trim());
+    return result;
+  }
+
+  async function getRenewalData() {
+    try {
+      const response = await fetch(chrome.runtime.getURL("lgweb.csv"));
+      const text = await response.text();
+      const rows = text.split(/\r?\n/).slice(1);
+      const dataMap = {};
+
+      rows.forEach((row) => {
+        if (!row.trim()) return; // 空行をスキップ
+
+        // 新しいパース関数を使って列を正確に分割
+        const columns = parseCSVRow(row);
+
+        if (columns.length >= 9) {
+          // 5列目(インデックス4)と9列目(インデックス8)を取得し、引用符を除去
+          let urlStr = columns[4].replace(/^"/, "").replace(/"$/, "");
+          let dateStr = columns[8].replace(/^"/, "").replace(/"$/, "");
+
+          try {
+            if (!urlStr.startsWith("http")) urlStr = "http://" + urlStr;
+            const domain = new URL(urlStr).hostname;
+            dataMap[domain] = dateStr;
+          } catch (e) {
+            if (urlStr) dataMap[urlStr] = dateStr;
+          }
+        }
+      });
+      return dataMap;
+    } catch (e) {
+      console.error("CSV読み込みエラー:", e);
+      return {};
+    }
+  }
+
+  const renewalData = await getRenewalData();
+
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
     const currentTab = tabs[0];
+    const currentUrl = new URL(currentTab.url);
+    const currentDomain = currentUrl.hostname;
+
     document.getElementById("url").value = currentTab.url;
 
     chrome.scripting.executeScript(
@@ -94,35 +152,27 @@ document.addEventListener("DOMContentLoaded", () => {
             { str: '検索条件', ans: '回答' },
           ];
 
-        for (const item of stringsToCheck) {
-          if (typeof item.str === 'string' && html.includes(item.str)) {
-            return item.ans;
-          } else if (item.str instanceof RegExp && item.str.test(html)) { // RegExpとtest()を使用
-            return item.ans;
+          let cmsName = "該当するCMSはありません";
+          for (const item of stringsToCheck) {
+            if (html.includes(item.str)) {
+              cmsName = item.ans;
+              break;
+            }
           }
-        }
-          return "該当するCMSはありません。";
+          return cmsName;
         },
       },
       (injectionResults) => {
-        if (chrome.runtime.lastError) {
-          document.getElementById("result").textContent =
-            "エラー: " + chrome.runtime.lastError.message;
-          return;
-        }
+        if (!injectionResults || !injectionResults[0]) return;
+        const resultText = injectionResults[0].result;
 
-        if (
-          injectionResults &&
-          injectionResults[0] &&
-          injectionResults[0].result
-        ) {
-          document.getElementById("result").textContent =
-            injectionResults[0].result;
-        } else {
-          document.getElementById("result").textContent =
-            "結果を取得できませんでした。";
-        }
-      }
+        const matchedDate = renewalData[currentDomain];
+        const dateDisplay =
+          matchedDate && matchedDate !== "" ? matchedDate : "不明";
+
+        document.getElementById("result").innerHTML =
+          `CMS: ${resultText}<br><span>リニューアル日: ${dateDisplay}</span>`;
+      },
     );
   });
 });
