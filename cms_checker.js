@@ -73,11 +73,13 @@ document.addEventListener("DOMContentLoaded", async () => {
           const stringsToCheck = [
             { reg: /smart-lgov/, ans: "SmartCMS" },
             { reg: /src="\/ssi\//, ans: "NetCrew" },
-            { reg: /src="\/shared\//, ans: "CMS-8341" },
+            { reg: /\/shared\/site/, ans: "CMS-8341" },
+            { reg: /\/shared\/style\//, ans: "CMS-8341" },
+            { reg: /\/shared\/rn\//, ans: "CMS-8341" },
             { reg: /\/_template_\//, ans: "TsuNaGo" },
             { reg: /WCVTEXT/, ans: "CMSKIT" },
             { reg: /背景色－黒/, ans: "CMSKIT" },
-            { reg: /\/_assets\/css\//, ans: "CMSKIT" },
+            { reg: /\/_assets\/css/, ans: "CMSKIT" },
             { reg: /scs_jyogai_start/, ans: "4Uweb\/CMS" },
             { reg: /class="jsmessage"/, ans: "4Uweb\/CMS" },
             { reg: /SS\.config/, ans: "SHIRASAGI" },
@@ -87,20 +89,25 @@ document.addEventListener("DOMContentLoaded", async () => {
             { reg: /\/_common\/themes\//, ans: "Joruri CMS ver.3以下" },
             { reg: /\/_themes\//, ans: "Joruri or ZOMEKI" },
             { reg: /▼▼フリーHTML▼▼/, ans: "UD Face" },
-            { reg: /0-0-0-0-0-0\.html/, ans: "UD Face" },
+            { reg: /(\d{1,2}-){9}\d{1,2}\.html/, ans: "UD Face" },
             { reg: /href="wikiplus\//, ans: "WIKIPLUS" },
             { reg: /src="wikiplus\//, ans: "WIKIPLUS" },
             { reg: /\/wp-content\//, ans: "WordPress" },
             { reg: /\/wp-includes\//, ans: "WordPress" },
             { reg: /\/wp-admin\//, ans: "WordPress" },
-            { reg: /\/wp\//, ans: "WordPress" },
             { reg: /\/www\/assets\//, ans: "i-CityPortal" },
             { reg: /href="\/www\/index\.html/, ans: "i-CityPortal" },
             { reg: /href="\/www\/contents\//, ans: "i-CityPortal" },
             { reg: /\/css\/Browser_C\//, ans: "i-SITE PORTAL" },
             { reg: /src="\/core\//, ans: "WebコアEnterprise（WebコアCMS）" },
-            { reg: /\/shared_new\/shared\//, ans: "WebコアEnterprise（WebコアCMS）" },
-            { reg: /src="\/materials\//, ans: "WebコアEnterprise（WebコアCMS）" },
+            {
+              reg: /\/shared_new\/shared\//,
+              ans: "WebコアEnterprise（WebコアCMS）",
+            },
+            {
+              reg: /src="\/materials\//,
+              ans: "WebコアEnterprise（WebコアCMS）",
+            },
             { reg: /\/mt-/, ans: "MovableType" },
             { reg: /form\.movabletype\.net/, ans: "MovableType" },
             { reg: /\/Local\//, ans: "WMS（ウェブマネージメントシステム）" },
@@ -109,12 +116,18 @@ document.addEventListener("DOMContentLoaded", async () => {
             { reg: /skin\/common\//, ans: "優CMS" },
             { reg: /\/share\/style\//, ans: "e-CLEAR" },
             { reg: /\/file\/css\//, ans: "BayBerry" },
-            { reg: /content="Drupal/, ans: "Drupal（下層ページを見るとWordPressの場合があります）" },
+            {
+              reg: /content="Drupal/,
+              ans: "Drupal（下層ページを見るとWordPressの場合があります）",
+            },
             { reg: /src="https:\/\/img\.japandx\.co\.jp\//, ans: "Web CMS" },
             { reg: /\/rss\/RssFeed\.jsp/, ans: "株式会社アイアムの独自CMS" },
             { reg: /\/detail\.jsp\?id=/, ans: "株式会社アイアムの独自CMS" },
             { reg: /\/user\/common\//, ans: "JSM（ジャプロサイトメーカー）" },
-            { reg: /\/user\/gyosei\/common/, ans: "JSM（ジャプロサイトメーカー）" },
+            {
+              reg: /\/user\/gyosei\/common/,
+              ans: "JSM（ジャプロサイトメーカー）",
+            },
             { reg: /src="\/themes\//, ans: "Concrete CMS" },
             { reg: /css\/\d+_/, ans: "みなさいと" },
             { reg: /\/\?category=/, ans: "不明CMS1" },
@@ -123,66 +136,108 @@ document.addEventListener("DOMContentLoaded", async () => {
             { reg: /\/page000/, ans: "不明CMS4" },
             { reg: /\/files\/100/, ans: "不明CMS4" },
             { reg: /\/index\.cfm\//, ans: "不明CMS5" },
+            { reg: /\.aspx\?servno=\d{1,5}/, ans: "不明CMS6" },
             { reg: /href="\/theme\//, ans: "不明CMS8" },
             { reg: /src="\/assets\/js\/bundle\.js/, ans: "不明CMS10" },
             { reg: /\/_nuxt\/entry\./, ans: "不明CMS11" },
+
+            { reg: /\/list00\d{3}\.html"/, ans: "不明CMS14" },
             { reg: /class="opening"/, ans: "不明CMS14" },
-            { reg: /\/list00101\.html"/, ans: "不明CMS15" },
+            { reg: /\/dynamic\/common\//, ans: "不明CMS14" },
             { reg: /\/banner_click\.php\?/, ans: "不明CMS16" },
-            { reg: /-img\//, ans: "不明CMS17" },
+            { reg: /-img\//, ans: "WebRelease" },
             { reg: /\/post_/, ans: "不明CMS19" },
             { reg: /\/detail\.php\?id=/, ans: "不明CMS20" },
             { reg: /\/index\.php\?id=/, ans: "不明CMS21" },
             { reg: /\/documents\/m_cms\//, ans: "不明CMS22" },
-            { reg: /\/dynamic\/common\//, ans: "不明CMS23" },
+            { reg: /\/List.aspx?/, ans: "不明CMS23" },
             { reg: /\/life\/list\.php\?/, ans: "不明CMS24" },
-            { reg: /JavascriptをONにすることをお勧めします。/, ans: "不明CMS25" },
-            { reg: /href="styles\.[a-z0-9]+\.css"/, ans: "スマートシティプラットフォーム（都市OS)" },
+            {
+              reg: /JavascriptをONにすることをお勧めします。/,
+              ans: "不明CMS25",
+            },
+
+            {
+              reg: /href="styles\.[a-z0-9]+\.css"/,
+              ans: "スマートシティプラットフォーム（都市OS)",
+            },
             { reg: /^[a-z]-header/, ans: "PowerCMS" },
             { reg: /^[a-z]-footer/, ans: "PowerCMS" },
-            { reg: /href="\/assets\/css\//, ans: "PowerCMS" },
+            { reg: /assets\/css\//, ans: "PowerCMS" },
+            { reg: /content="与謝野町"/, ans: "PowerCMS" },
+            { reg: /class="header-utilit/, ans: "株式会社トラパンツの独自CMS" },
+            {
+              reg: /<form[^>]*action=["']https:\/\/.*?\.jp\/front\/search/,
+              ans: "株式会社トラパンツの独自CMS",
+            },
             { reg: /検索条件をいれる/, ans: "回答を表示" },
           ];
 
-            // WillCommunity
-            // WEB-NA
-            // assetnow
-            // WebRelease
-            // NetCommons
-            // SITE PUBLIS
+          // WillCommunity
+          // WEB-NA
+          // assetnow
+          // NetCommons
+          // SITE PUBLIS
 
-          let cmsName = "該当するCMSはありません";
+          let foundCms = { name: "該当するCMSはありません", matchedText: "" };
           for (const item of stringsToCheck) {
-            if (item.reg.test(html)) {
-              cmsName = item.ans;
+            const match = html.match(item.reg); // matchメソッドを使用
+            if (match) {
+              foundCms.name = item.ans;
+              foundCms.matchedText = match[0]; // 一致した文字列を格納
               break;
             }
           }
-          return cmsName;
+          return foundCms; // オブジェクトとして返す
         },
       },
       (injectionResults) => {
         if (!injectionResults || !injectionResults[0]) return;
-        const resultText = injectionResults[0].result;
+        const resultObj = injectionResults[0].result;
 
+        // 1. CSVにドメインが存在するかを厳密にチェック
+        const hasDomainData = currentDomain in renewalData;
         const matchedDate = renewalData[currentDomain];
-        let dateDisplay = (matchedDate && matchedDate !== "") ? matchedDate : "不明";
-        let dateClass = ""; // 未来判定用のクラス名
 
-        // 未来の日付判定
-        if (matchedDate && matchedDate !== "") {
+        let dateDisplay = "";
+        let dateClass = "renewal-date";
+
+        if (!hasDomainData) {
+          // A. CSVにドメイン自体が登録されていない場合
+          dateDisplay = "自治体公式サイトではありません";
+        } else if (!matchedDate || matchedDate === "") {
+          // B. ドメインはあるが、日付の項目が空の場合
+          dateDisplay = "リニューアル日: 不明";
+        } else {
+          // C. 日付データがある場合
+          dateDisplay = `リニューアル日: ${matchedDate}`;
+
           const now = new Date();
           const renewalDateObj = new Date(matchedDate);
 
+          // 未来の日付（リニューアル予定）の判定
           if (renewalDateObj > now) {
             dateDisplay += "（リニューアル予定）";
-            dateClass = "future-date"; // style.cssで定義した赤文字用クラス
+            dateClass += " future-date";
           }
         }
 
-        document.getElementById("result").innerHTML =
-          `CMS: ${resultText}<br><span class="${dateClass}">リニューアル日: ${dateDisplay}</span>`;
-      }
+        // HTMLの組み立て
+        let htmlContent = `<span class="cms-name">CMS: ${resultObj.name}</span>`;
+
+        if (resultObj.matchedText) {
+          // 特殊文字をエスケープして表示
+          const escapedText = resultObj.matchedText
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;");
+          htmlContent += `<span class="matched-code">(一致: ${escapedText})</span>`;
+        }
+
+        htmlContent += `<span class="${dateClass}">${dateDisplay}</span>`;
+
+        document.getElementById("result").innerHTML = htmlContent;
+      },
     );
   });
 });
