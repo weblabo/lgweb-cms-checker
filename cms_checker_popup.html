@@ -3,67 +3,27 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>自治体公式サイト CMS Checker</title>
-    <script src="./cms_checker.js"></script>
-
-    <style>
-      :where(:root) {
-        line-break: strict;
-        word-break: normal;
-        overflow-wrap: anywhere;
-        text-spacing-trim: trim-start;
-        text-autospace: normal;
-        scrollbar-gutter: stable;
-      }
-
-      :where(
-        pre,
-        time,
-        input:not([type="button" i], [type="submit" i], [type="reset" i]),
-        textarea,
-        [contenteditable]
-      ) {
-        text-autospace: no-autospace;
-      }
-
-      :where(h1, h2, h3, h4, h5, h6) {
-        text-wrap: pretty;
-      }
-
-      body {
-        width: 480px;
-        margin: 0;
-        padding: 16px;
-        line-height: 1.6;
-        background-color: #f0fafe;
-        font-family:
-          "Helvetica Neue", "Arial", "Hiragino Kaku Gothic ProN",
-          "Hiragino Sans", "BIZ UDPGothic", "Noto Sans JP", sans-serif;
-      }
-
-      h2 {
-        margin: 0 0 12px;
-        font-size: 1.2rem;
-      }
-
-      input {
-        width: 400px;
-      }
-
-      hr {
-        margin: 1rem 0;
-      }
-
-    </style>
+    <title>自治体 CMS Checker</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="js/cms_checker.js"></script>
   </head>
 
   <body>
-    <div class="container">
-      <h2>自治体サイト CMS Checker</h2>
-      <label for="url">URL:</label>
-      <input type="text" id="url" readonly />
+    <h2>
+      <img src="icons/icon16_active.png" alt="" />
+      自治体 CMS Checker
+    </h2>
+
+    <div class="input-group">
+      <label for="url">現在のURL</label>
+      <input type="text" id="url" readonly placeholder="読み込み中..." />
     </div>
-    <hr />
-    <div id="result"></div>
+
+    <div id="result">
+      <span style="background: transparent; color: #64748b;">分析中...</span>
+    </div>
+    
+    <div class="advice">※表示されるCMS、リニューアル日は参考値です。</div>
+    <div class="advice">※エントランスページ（スプラッシュページ）では正しく判定されない場合があるため、総合トップページ等でのチェックを推奨します。</div>
   </body>
 </html>

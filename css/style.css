@@ -1,0 +1,153 @@
+@charset "UTF-8";
+
+/* ==================================================
+  1. 変数定義 (Variables)
+================================================== */
+:root {
+  --bg-app: #f8fafc;
+  --bg-card: #ffffff;
+  --text-main: #1e293b;
+  --text-dark: #0f172a;
+  --text-muted: #4b5563;
+  --text-advice: #576574;
+  --primary: #2563eb;
+  --primary-light: rgba(37, 99, 235, 0.1);
+  --border: #cbd5e1;
+  --error: #dc2626;
+  --date-badge: #e2e8f0;
+  --shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+/* ==================================================
+  2. ベーススタイル (Base Layout)
+================================================== */
+body {
+  width: 380px;
+  margin: 0;
+  padding: 20px;
+  background-color: var(--bg-app);
+  color: var(--text-main);
+  font-family: "Helvetica Neue", "Arial", "Hiragino Kaku Gothic ProN", "Hiragino Sans", "BIZ UDPGothic", "Noto Sans JP", sans-serif;
+  line-height: 1.5;
+}
+
+h2 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 20px;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-dark);
+}
+
+.icon {
+  color: var(--primary);
+}
+
+/* ==================================================
+  3. 入力フォーム (Input Area)
+================================================== */
+.input-group {
+  margin-bottom: 20px;
+}
+
+label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+input {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 10px 12px;
+  font-size: 0.9rem;
+  color: var(--text-dark);
+  background-color: var(--bg-card);
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  outline: none;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
+}
+
+input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-light);
+}
+
+/* ==================================================
+  4. 結果表示エリア (Result Card)
+================================================== */
+#result {
+  margin: 0 0 0.5rem;
+  padding: 24px 16px;
+  text-align: center;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+}
+
+.cms-name {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 1.1rem;
+  color: var(--primary);
+}
+
+.matched-code {
+  display: block;
+  margin-bottom: 16px;
+  padding: 0 8px;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-family: "SFMono-Regular", Consolas, monospace;
+  word-break: break-all;
+}
+
+.renewal-date {
+  display: inline-block;
+  padding: 4px 16px;
+  font-size: 0.85rem;
+  color: var(--text-dark);
+  background-color: var(--date-badge);
+  border-radius: 20px;
+}
+
+.renewal-date.is-future,
+.future-date {
+  padding: 4px 0;
+  font-weight: 700;
+  color: var(--error);
+  background-color: transparent;
+}
+
+/* ==================================================
+  5. フッター・状態クラス (Footer & Status)
+================================================== */
+.footer-info {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 20px;
+  text-align: center;
+}
+
+.advice {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  padding: 0 0 0 1rem;
+  text-indent: -1rem;
+}
+
+/* ==================================================
+  6. 一致情報 (Secret Match)
+================================================== */
+#secret-match {
+  margin: 0.75em 0 0;
+}
