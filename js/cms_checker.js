@@ -76,59 +76,82 @@ document.addEventListener("DOMContentLoaded", async () => {
       const currentDomain = currentUrl.hostname;
       document.getElementById("url").value = currentTab.url;
 
+      // ページのHTMLを取得して直接CMS判定
       chrome.scripting.executeScript(
         {
           target: { tabId: currentTab.id },
-          files: ["js/cms_detector.js"],
+          func: () => document.documentElement.outerHTML,
         },
-        (injectionResults) => {
-          if (!injectionResults || !injectionResults[0]) return;
-          const resultObj = injectionResults[0].result;
+        (results) => {
+          if (!results || !results[0]) return;
+          const html = results[0].result;
+          // js/cms_detector.jsのdetectCMS関数を利用
+          // 動的importで関数を取得
+          import(chrome.runtime.getURL('js/cms_detector.js')).then(module => {
+            const resultObj = module.detectCMS(html);
 
-          const hasDomainData = currentDomain in renewalData;
-          const matchedDate = renewalData[currentDomain];
+            const hasDomainData = currentDomain in renewalData;
+            const matchedDate = renewalData[currentDomain];
 
-          let dateDisplay = "";
-          let dateClass = "renewal-date";
+            let dateDisplay = "";
+            let dateClass = "renewal-date";
 
-          if (!hasDomainData) {
-            dateDisplay = "自治体公式サイトではありません";
-          } else if (!matchedDate || matchedDate === "") {
-            dateDisplay = "リニューアル日: 不明";
-          } else {
-            dateDisplay = `リニューアル日: ${matchedDate}`;
-            const now = new Date();
-            const renewalDateObj = new Date(matchedDate);
-            if (renewalDateObj > now) {
-              dateDisplay += "（リニューアル予定）";
-              dateClass += " future-date";
-            }
-          }
-
-          let htmlContent = `<div><span class="cms-name">CMS: ${resultObj.name}</span></div>`;
-          htmlContent += `<div><span class="${dateClass}">${dateDisplay}</span></div>`;
-
-          // 一致内容（Shiftキーで表示）のHTML
-          if (resultObj.matchedText) {
-            const escapedText = resultObj.matchedText
-              .replace(/&/g, "&amp;")
-              .replace(/</g, "&lt;")
-              .replace(/>/g, "&gt;");
-            htmlContent += `<div id="secret-match" class="matched-code" style="display: none;">(一致内容: ${escapedText})</div>`;
-          }
-
-          document.getElementById("result").innerHTML = htmlContent;
-
-          // Shiftキーイベント
-          window.addEventListener("keydown", (e) => {
-            if (e.key === "Shift") {
-              const secretEl = document.getElementById("secret-match");
-              if (secretEl) {
-                secretEl.style.display = "block";
+            if (!hasDomainData) {
+              dateDisplay = "自治体公式サイトではありません";
+            } else if (!matchedDate || matchedDate === "") {
+              dateDisplay = "リニューアル日: 不明";
+            } else {
+              dateDisplay = `リニューアル日: ${matchedDate}`;
+              const now = new Date();
+              const renewalDateObj = new Date(matchedDate);
+              if (renewalDateObj > now) {
+                dateDisplay += "（リニューアル予定）";
+                dateClass += " future-date";
               }
             }
+
+
+            // --- CMSごとにアイコンを動的変更 ---
+            const cmsIconMap = {
+              "WordPress": "icons/icon16_wp.png",
+              "SmartCMS": "icons/icon16_smartcms.png",
+              // 必要に応じて他CMSも追加
+            };
+            const iconPath = cmsIconMap[resultObj.name] || "icons/icon16_active.png";
+            chrome.action.setIcon({
+              path: {
+                16: iconPath,
+                32: iconPath.replace('16', '32'),
+                48: iconPath.replace('16', '48'),
+                128: iconPath.replace('16', '128'),
+              },
+            });
+
+            let htmlContent = `<div><img src=\"${iconPath}\" alt=\"${resultObj.name}アイコン\" width=16 height=16 style=\"vertical-align:middle;margin-right:6px;\"><span class=\"cms-name\">CMS: ${resultObj.name}</span></div>`;
+            htmlContent += `<div><span class=\"${dateClass}\">${dateDisplay}</span></div>`;
+
+            // 一致内容（Shiftキーで表示）のHTML
+            if (resultObj.matchedText) {
+              const escapedText = resultObj.matchedText
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;");
+              htmlContent += `<div id=\"secret-match\" class=\"matched-code\" style=\"display: none;\">(一致内容: ${escapedText})</div>`;
+            }
+
+            document.getElementById("result").innerHTML = htmlContent;
+
+            // Shiftキーイベント
+            window.addEventListener("keydown", (e) => {
+              if (e.key === "Shift") {
+                const secretEl = document.getElementById("secret-match");
+                if (secretEl) {
+                  secretEl.style.display = "block";
+                }
+              }
+            });
           });
-        },
+        }
       );
     }
   });

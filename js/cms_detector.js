@@ -1,5 +1,5 @@
-(() => {
-  const html = document.documentElement.outerHTML;
+// CMS判定ロジックを関数化し、他ファイルからも利用可能に
+function detectCMS(html) {
   const stringsToCheck = [
     { reg: /smart-lgov/, ans: "SmartCMS" },
     { reg: /var cms_api_domain=/, ans: "SmartCMS" },
@@ -162,4 +162,9 @@
     }
   }
   return foundCms;
-})();
+}
+
+// 既存のIIFE呼び出しも維持（従来の動作保証のため）
+if (typeof document !== 'undefined') {
+  detectCMS(document.documentElement.outerHTML);
+}
